@@ -70,7 +70,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Кнопка для GET запроса
     get_button = st.button(
-        "📤 Send with GET",
+        "📤 Оценить текст GET",
         type="primary",
         use_container_width=True
     )
@@ -78,14 +78,56 @@ with col1:
 with col2:
     # Кнопка для POST запроса
     post_button = st.button(
-        "📨 Send with POST",
+        "📨 Оценить текст POST",
         type="primary",
         use_container_width=True
     )
 
+
+# Основной интерфейс
+st.subheader("✍️ Несколько текстов!")
+
+# Поле для ввода текста
+user_input1 = st.text_area(
+    "Enter your text here:",
+    height=150,
+    placeholder="Введите тексты через /...",
+    key="text_input"
+)
+
+col3 = st.columns(1)
+
+
+with col3:
+    # Кнопка для POST запроса
+    postSeveral_button = st.button(
+        "📨 Оценить несколько текстов! POST",
+        type="primary",
+        use_container_width=True
+    )
+
+
 st.markdown("---")
 
 # Обработка GET запроса
+if postSeveral_button:
+    if user_input.strip():
+        with st.spinner("Sending POST request..."):
+            result = send_get_request(user_input)
+
+            st.subheader("📤 GET Request Result")
+            st.success("Request sent successfully!")
+
+            # Отображение результата
+            with st.container():
+                st.markdown("**Response:**")
+                if isinstance(result, dict):
+                    st.json(result)
+                else:
+                    st.code(result, language="json")
+    else:
+        st.warning("⚠️ Please enter some text before sending")
+
 if get_button:
     if user_input.strip():
         with st.spinner("Sending GET request..."):
@@ -103,6 +145,8 @@ if get_button:
                     st.code(result, language="json")
     else:
         st.warning("⚠️ Please enter some text before sending")
+
+
 
 # Обработка POST запроса
 if post_button:
