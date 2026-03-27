@@ -14,7 +14,7 @@ class ItemsBatch(BaseModel):
 
 
 app = FastAPI()
-classifier = pipeline("sentiment-analysis")
+classifier = pipeline("text-classification")
 
 
 @app.get("/")
@@ -35,5 +35,4 @@ def predict(item: Item):
 @app.post("/predict_multiple/")
 def predict_batch(items: ItemsBatch):
     results = classifier(items.texts)
-    print(items.texts)
     return {"results": results}
