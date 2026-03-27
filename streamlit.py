@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 import json
+import pandas as pd
+import numpy as np
 
-# Настройка страницы
 st.set_page_config(
     page_title="Оценка текста",
     page_icon="📝",
@@ -52,11 +53,11 @@ def send_post_request(text):
 def send_post_several_text_request(text):
     if text:
         try:
-            url = ""
+            url = "/predict_multiple/"
                 # Ввести url для нескольких текстов
                 # "http://localhost:8000/predict/batch"
 
-
+            print("Работает!!!")
             # Отправляем POST запрос с JSON телом
             payload = {"text": text}
             response = requests.post(url, json=payload)
@@ -114,6 +115,8 @@ user_input1 = st.text_area(
 
 
 
+
+
     # Кнопка для POST запроса
 postSeveral_button = st.button(
     "📨 Оценить несколько текстов! Через POST запрос",
@@ -128,7 +131,10 @@ st.markdown("---")
 if postSeveral_button:
     if user_input1.strip():
         with st.spinner("Отправляем POST запрос..."):
-            result = send_get_request(user_input1)
+
+            textU = user_input1.split('/')
+
+            result = send_get_request(textU)
 
             st.subheader("📨 Результат POST запроса")
             st.success("Запрос успешно отправлен!")
