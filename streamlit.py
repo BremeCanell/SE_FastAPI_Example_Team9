@@ -58,6 +58,7 @@ def send_post_several_text_request(text):
                 # "http://localhost:8000/predict/batch"
 
             print("Работает!!!")
+
             # Отправляем POST запрос с JSON телом
             payload = {"text": text}
             response = requests.post(url, json=payload)
