@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import FastAPI
 from transformers import pipeline
 from pydantic import BaseModel
@@ -5,6 +7,10 @@ from pydantic import BaseModel
 
 class Item(BaseModel):
     text: str
+
+
+class ItemsBatch(BaseModel):
+    texts: List[str]
 
 
 app = FastAPI()
@@ -24,3 +30,10 @@ def get_params(text: str):
 @app.post("/predict/")
 def predict(item: Item):
     return classifier(item.text)
+
+
+@app.post("/predict_multiple/")
+def predict_batch(items: ItemsBatch):
+    results = classifier(items.texts)
+    print(items.texts)
+    return {"results": results}
