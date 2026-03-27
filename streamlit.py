@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
 import json
-import pandas as pd
-import numpy as np
+from typing import Union, List, Dict, Any
 
 st.set_page_config(
     page_title="Оценка текста",
@@ -10,13 +9,12 @@ st.set_page_config(
     layout="centered"
 )
 
-# Заголовок приложения
 st.title("📝 Приложение для оценки текста")
 st.markdown("---")
 
 
-# Функция для отправки GET запроса
-def send_get_request(text):
+def send_get_request(text: str) -> Union[Dict[str, Any], str]:
+    """Send GET request to the server"""
     if text:
         try:
             url = f"http://localhost:8000/{text}"
@@ -32,13 +30,12 @@ def send_get_request(text):
     return "Пожалуйста, введите текст"
 
 
-# Функция для отправки POST запроса
-def send_post_request(text):
+def send_post_request(text: str) -> Union[Dict[str, Any], str]:
+    """Send POST request to the server"""
     if text:
         try:
             url = "http://localhost:8000/predict/"
 
-            # Отправляем POST запрос с JSON телом
             payload = {"text": text}
             response = requests.post(url, json=payload)
 
@@ -50,17 +47,14 @@ def send_post_request(text):
             return f"Connection error: {str(e)}"
     return "Пожалуйста, введите текст"
 
-def send_post_several_text_request(text):
+
+def send_post_several_text_request(text: str) -> Union[Dict[str, Any], str]:
+    """Send POST request for multiple texts"""
     if text:
         try:
-            url = "/predict_multiple/"
-                # Ввести url для нескольких текстов
-                # "http://localhost:8000/predict/batch"
+            url = "http://localhost:8000/predict/batch"
 
-            print("Работает!!!")
-
-            # Отправляем POST запрос с JSON телом
-            payload = {"text": text}
+            payload = {"texts": text}
             response = requests.post(url, json=payload)
 
             if response.status_code == 200:
@@ -72,75 +66,57 @@ def send_post_several_text_request(text):
     return "Пожалуйста, введите текст"
 
 
-# Основной интерфейс
 st.subheader("✍️ Ввод текста")
 
-# Поле для ввода текста
-user_input = st.text_area(
+user_input: str = st.text_area(
     "Enter your text here:",
     height=150,
     placeholder="Введите или вставьте свой текст...",
     key="text_input"
 )
 
-# Создание двух колонок для кнопок
 col1, col2 = st.columns(2)
 
 with col1:
-    # Кнопка для GET запроса
-    get_button = st.button(
+    get_button: bool = st.button(
         "📤 Оценить текст GET",
         type="primary",
         use_container_width=True
     )
 
 with col2:
-    # Кнопка для POST запроса
-    post_button = st.button(
+    post_button: bool = st.button(
         "📨 Оценить текст через POST запрос",
         type="primary",
         use_container_width=True
     )
 
-
-# Основной интерфейс
 st.subheader("✍️ Несколько текстов!")
 
-# Поле для ввода текста
-user_input1 = st.text_area(
+user_input1: str = st.text_area(
     "Enter your text here:",
     height=150,
     placeholder="Введите или вставьте свои тексты через /...",
     key="text_input_several"
 )
 
-
-
-
-
-    # Кнопка для POST запроса
-postSeveral_button = st.button(
+postSeveral_button: bool = st.button(
     "📨 Оценить несколько текстов! Через POST запрос",
     type="primary",
     use_container_width=True
 )
 
-
 st.markdown("---")
 
-# Обработка GET запроса
 if postSeveral_button:
     if user_input1.strip():
         with st.spinner("Отправляем POST запрос..."):
+            texts_list: List[str] = [t.strip() for t in user_input1.split('/') if t.strip()]
+            result = send_post_several_text_request(texts_list)
 
-            textU = user_input1.split('/')
-
-            result = send_get_request(textU)
-
-            st.subheader("📨 Результат POST запроса")
+            st.subheader("📨 Результат POST запроса (несколько текстов)")
             st.success("Запрос успешно отправлен!")
 
-            # Отображение результата
             with st.container():
                 st.markdown("**Ответ:**")
                 if isinstance(result, dict):
@@ -155,10 +131,9 @@ if get_button:
         with st.spinner("Отправляем GET запрос..."):
             result = send_get_request(user_input)
 
-            st.subheader("📤  Результат GET запроса")
+            st.subheader("📤 Результат GET запроса")
             st.success("Запрос успешно отправлен!")
 
-            # Отображение результата
             with st.container():
                 st.markdown("**Ответ:**")
                 if isinstance(result, dict):
@@ -168,9 +143,6 @@ if get_button:
     else:
         st.warning("⚠️ Пожалуйста, введите текст перед отправкой")
 
-
-
-# Обработка POST запроса
 if post_button:
     if user_input.strip():
         with st.spinner("Отправляем POST запрос..."):
@@ -179,7 +151,6 @@ if post_button:
             st.subheader("📨 Результат POST запроса")
             st.success("Запрос успешно отправлен!")
 
-            # Отображение результата
             with st.container():
                 st.markdown("**Response:**")
                 if isinstance(result, dict):
@@ -189,11 +160,6 @@ if post_button:
     else:
         st.warning("⚠️ Пожалуйста, введите текст перед отправкой")
 
-# Дополнительная информация
-
-
-
-# Стилизация (опционально)
 st.markdown("""
 <style>
 .stButton button {
